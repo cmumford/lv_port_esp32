@@ -200,10 +200,19 @@ bool lvgl_spi_driver_init(int host,
     int dma_channel,
     int quadwp_pin, int quadhd_pin)
 {
+#if defined(CONFIG_IDF_TARGET_ESP32)
     assert((SPI_HOST <= host) && (VSPI_HOST >= host));
+#elif defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)
+    assert((SPI_HOST <= host) && (FSPI_HOST >= host));
+#endif
 
     const char *spi_names[] = {
-        "SPI_HOST", "HSPI_HOST", "VSPI_HOST"
+        "SPI_HOST", "HSPI_HOST",
+#if defined(CONFIG_IDF_TARGET_ESP32)
+        "VSPI_HOST"
+#elif defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)
+        "FSPI_HOST"
+#endif
     };
 
     ESP_LOGI(TAG, "Configuring SPI host %s (%d)", spi_names[host], host);
